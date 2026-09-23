@@ -3,6 +3,7 @@ import os
 import json
 import requests
 from datetime import datetime
+import time
 
 # API we want to extract data frpm
 url = 'https://api.tfl.gov.uk/BikePoint/'
@@ -15,17 +16,43 @@ os.makedirs(data_dir, exist_ok = True)
 timestamp = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
 filename = f'{data_dir}/{timestamp}.json'
 
-# send a GET request to the API
-response = requests.get(url)
+# set up a retry settings in case if API fails
+max_retry = 5
+attempt = 0
+delay = 10
 
-# get status
-status = response.status_code
+# keep trying until the maximum number of attempts or the succesfull extraction
+while attempt < max_retry:
 
-# 
+    # send a GET request to the API
+    response = requests.get(url)
 
-# convert the json response into python variable
-data = response.json()
+    # get status
+    status = response.status_code
 
-# open the output file and write the API data to it as json
-with open(filename, 'w') as file:
-    json.dump(data, file)
+    # if statement based on the status code
+    if 200 <= status < 300:
+        # convert the json response into python variable
+        data = response.json()
+
+        # open the output file and write the API data to it as json
+        with open(filename, 'w') as file:
+            json.dump(data, file)
+
+        # print the success comment and break the loop
+        print(f'File {filename} was successfully saved')
+        break
+
+    # elif statement for the errors
+    elif status < 200 or status >= 500:
+        time.sleep(delay)
+        attempt += 1
+        print(f'Status code: {status}. Retrying. Attempt number {attempt}')
+
+    # all other errors
+    else:
+        print(f'Error. Status code: {status}')
+        break
+
+    
+
