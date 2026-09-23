@@ -4,6 +4,7 @@ import json
 import requests
 from datetime import datetime
 import time
+import logging
 
 # API we want to extract data frpm
 url = 'https://api.tfl.gov.uk/BikePoint/'
@@ -15,6 +16,22 @@ os.makedirs(data_dir, exist_ok = True)
 # create a timestamp so each extract gets a unique filename
 timestamp = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
 filename = f'{data_dir}/{timestamp}.json'
+
+# create a folder for log files if it doesn't exist already
+log_dir = 'log'
+os.makedirs(log_dir, exist_ok = True)
+log_filename = f'{log_dir}/{timestamp}.json'
+
+# configure logging so messages are written to the log file
+logging.basicConfig(
+    filename = log_filename,
+    format = '%(asctime)s - %(levelname)s - %(message)s',
+    level = logging.INFO
+)
+
+# create the logger and confirm that it has been successfully set up
+logger = logging.getLogger()
+logger.info('Logger successfully initialised')
 
 # set up a retry settings in case if API fails
 max_retry = 5
@@ -44,12 +61,15 @@ while attempt < max_retry:
 
                 # print the success comment and break the loop
                 print(f'File {filename} was successfully saved')
+                logger.info(f'File {filename} was successfully saved')
                 
             except Exception as e:
                 print(f'An error has occured: {e}')
+                logger.error(f'An error has occured: {e}')
         # API request was succesfull, but no data recieved
         else:
             print('No data returned')
+            logger.warning('No data returned')
         break
 
     # elif statement for the errors
@@ -57,10 +77,12 @@ while attempt < max_retry:
         time.sleep(delay)
         attempt += 1
         print(f'Status code: {status}. Retrying. Attempt number {attempt}')
+        logger.info(f'Status code: {status}. Retrying. Attempt number {attempt}')
 
     # all other errors
     else:
         print(f'Error. Status code: {status}')
+        logger.critical(f'Error. Status code: {status}')
         break
 
     
