@@ -20,6 +20,7 @@ filename = f'{data_dir}/{timestamp}.json'
 # create a folder for log files if it doesn't exist already
 log_dir = 'log'
 os.makedirs(log_dir, exist_ok = True)
+
 log_filename = f'{log_dir}/extract_{timestamp}.log'
 
 # configure logging so messages are written to the log file
