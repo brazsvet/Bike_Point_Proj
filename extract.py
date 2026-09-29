@@ -4,7 +4,7 @@ import json
 import requests
 from datetime import datetime
 import time
-import logging
+from modules.log_initialise import setup_logging
 
 # API we want to extract data frpm
 url = 'https://api.tfl.gov.uk/BikePoint/'
@@ -21,17 +21,20 @@ filename = f'{data_dir}/{timestamp}.json'
 log_dir = 'log'
 os.makedirs(log_dir, exist_ok = True)
 
-log_filename = f'{log_dir}/extract_{timestamp}.log'
+# call setup_logging function from log_initialise to set up the logger
+logger = setup_logging(log_dir, timestamp)
 
-# configure logging so messages are written to the log file
-logging.basicConfig(
-    filename = log_filename,
-    format = '%(asctime)s - %(levelname)s - %(message)s',
-    level = logging.INFO
-)
+# log_filename = f'{log_dir}/extract_{timestamp}.log'
 
-# create the logger and confirm that it has been successfully set up
-logger = logging.getLogger()
+# # configure logging so messages are written to the log file
+# logging.basicConfig(
+#     filename = log_filename,
+#     format = '%(asctime)s - %(levelname)s - %(message)s',
+#     level = logging.INFO
+# )
+
+# # create the logger and confirm that it has been successfully set up
+# logger = logging.getLogger()
 logger.info('Logger successfully initialised')
 
 # set up a retry settings in case if API fails
