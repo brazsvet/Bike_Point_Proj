@@ -4,7 +4,7 @@ import os
 import logging
 
 # create logger and confirm that it was successfully set up
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 def load_files_to_s3(data_dir:str, AWS_ACCESS_KEY:str, AWS_SECRET_ACCESS_KEY:str, AWS_BUCKET_NAME:str):
     """Upload all the files in the directory to the s3 bucket.
